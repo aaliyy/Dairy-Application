@@ -62,14 +62,10 @@ export const DairyProvider = ({ children }) => {
   // ✅ Add a new supplier locally with sequential ID
   const addSupplier = (supplier) => {
     setSuppliers((prev) => {
-      const maxId = prev.length > 0
-        ? Math.max(...prev.map((s) => parseInt(s.id) || 0))
-        : 0;
+      
 
       const newSupplier = {
         ...supplier,
-        id: (maxId + 1).toString(), // convert to string to match Firebase keys
-        date: new Date().toISOString(),
       };
 
       return [newSupplier, ...prev];
@@ -129,9 +125,6 @@ const Delete_Suppliers = (supplier) => {
 
             const itemRef = ref(db, path);
 
-            
-
-            // Perform delete
             await remove(itemRef);
 
             // Immediately update local state so UI reflects deletion

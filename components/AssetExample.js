@@ -65,7 +65,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         <View style={styles.statsRow}>
-          <TouchableOpacity style={[styles.actionButton, styles.yellowButton]} onPress={() => navigation.navigate('Daily Collection')}>
+          <TouchableOpacity style={[styles.actionButton, styles.yellowButton]} onPress={() => navigation.navigate('DailyCollection')}>
             <Text style={styles.buttonText}>Collection</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.actionButton, styles.grayButton]} onPress={() => navigation.navigate('Report')}>
