@@ -7,12 +7,13 @@ import { useDairy } from './context';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const { collections, suppliers,loading } = useDairy();
+  const { collections, suppliers,loading , Delete} = useDairy();
 
   const totalFat = collections.reduce((sum, item) => sum + Number(item.fat || 0), 0);
-  const avgFat = collections.length > 0 ? totalFat / collections.length : 0;
-  const totalLiters = collections.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-  const totalAmount = collections.reduce((sum, item) => sum + Number(item.price || 0), 0);
+    const avgFat = collections.length > 0 ? totalFat / collections.length : 0;
+    const totalLiters = collections.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    const totalAmount = collections.reduce((sum, item) => sum + Number(item.price || 0), 0);
+
   const recentCollection = collections.slice(0, 2);
   if (loading) return <ActivityIndicator />;
   return (
@@ -71,6 +72,9 @@ export default function HomeScreen() {
             <Text style={styles.darkButtonText}>Reports</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity style={[styles.actionButton, styles.grayButton]} onPress={() => navigation.navigate('QRS')}>
+            <Text style={styles.darkButtonText}>Scanner</Text>
+          </TouchableOpacity>
       </View>
 
       {/* Recent Collections */}
@@ -84,12 +88,13 @@ export default function HomeScreen() {
         <FlatList
           data={recentCollection}
           renderItem={({ item }) => (
-            <View style={styles.listCard}>
+
+            <TouchableOpacity style={styles.listCard} onLongPress={()=>Delete(item)}>
               <Text style={styles.listName}>{item.selectedSupplier}</Text>
               <Text style={styles.subtitle}>{item.quantity} L</Text>
               <Text>{new Date(item.date).toLocaleDateString('en-GB')}</Text>
               <Text style={styles.amount}>₹{item.price}</Text>
-            </View>
+            </TouchableOpacity>
           )}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={{ paddingBottom: 20 }}

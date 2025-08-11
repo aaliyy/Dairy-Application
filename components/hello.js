@@ -5,19 +5,22 @@ import { ref, push } from 'firebase/database';
 import { useDairy } from './context';
 
 export default function AddSupplierForm() {
-  const { addSupplier } = useDairy();
+  const { addSupplier,qrId } = useDairy();
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [phone, setPhone] = useState('');
 
   const handleAdd = () => {
     if (!name || !location || !phone) return;
-    addSupplier({ name, location, phone });
+    addSupplier({ name, location, phone,qrId });
+   
+  
 
      push(ref(db, 'suppliers/'), {
           Supplier_name:name,
           number:phone,
           location,
+          id: qrId, 
         });
     
     setName('');
@@ -47,6 +50,8 @@ export default function AddSupplierForm() {
         value={phone}
         onChangeText={setPhone}
       />
+  
+
       <TouchableOpacity style={styles.button} onPress={handleAdd}>
         <Text style={styles.buttonText}>Add Supplier</Text>
       </TouchableOpacity>

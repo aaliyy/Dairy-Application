@@ -1,21 +1,21 @@
-import { StyleSheet, FlatList, View, Text } from 'react-native'
+import { StyleSheet, FlatList, View, Text,TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useDairy } from './context'
 
 export default function AllCollection() {
-  const { collections } = useDairy();
+  const { collections, Delete } = useDairy();
 
   return (
     <View style={{ flex: 1 , backgroundColor: '#F3F4F6',paddingLeft:20,paddingRight:20}}>
       <FlatList
         data={collections}
         renderItem={({ item }) => (
-          <View style={styles.listCard}>
+          <TouchableOpacity onLongPress={()=>Delete(item)} style={styles.listCard}>
             <Text style={styles.listName}>{item.selectedSupplier}</Text>
             <Text style={styles.subtitle}>{item.quantity} L</Text>
             <Text>{new Date(item.date).toLocaleDateString('en-GB')}</Text>
             <Text style={styles.amount}>₹{item.price}</Text>
-          </View>
+          </TouchableOpacity>
         )}
         keyExtractor={(_, index) => index.toString()}
         contentContainerStyle={{ paddingBottom: 20 }}

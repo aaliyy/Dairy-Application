@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "MyAwesomeApp",
-    "slug": "MyAwesomeApp",
+    "scheme": "dairyapp",
+    "name": "DairyApp",
+    "slug": "dairyapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -30,6 +31,9 @@
       "eas": {
         "projectId": "ccb604aa-dfc3-4493-8681-0099bacb37cf"
       }
-    }
+    },
+    "plugins": [
+      "expo-barcode-scanner"
+    ]
   }
 }

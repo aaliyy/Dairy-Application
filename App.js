@@ -1,21 +1,62 @@
-// App.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Linking, Alert } from 'react-native'; // ✅ Add these imports
 import HomeScreen from './components/AssetExample';
 import AddSupplierScreen from './components/hello';
 import SupplierScreen from './components/Suppliers';
 import DailyCollectionForm from './components/collection';
 import ReportScreen from './components/Report';
 import AllCollection from './components/AllCollection';
+import SupplierDetails from './components/QR';
+import QRScanner from './components/scanner';
+
 import { DairyProvider } from './components/context';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  // ✅ Add debugging for deep links
+  useEffect(() => {
+    // Debug: Check if app was opened with a deep link
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        console.log('App opened with URL:', url);
+       
+      }
+    });
+
+    // Debug: Listen for deep links when app is already running
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      console.log('Deep link received while app running:', url);
+      Alert.alert('Deep Link Debug', `Received: ${url}`);
+    });
+
+    return () => subscription?.remove();
+  }, []);
+
+  const linking = {
+    prefixes: ['dairyapp://'],
+    config: {
+      screens: {
+        'Daily Collection': 'daily-collection/:supplierId',
+        QR: 'qr/:supplierId',
+        QRS: 'scanner',
+      },
+    },
+  };
+
   return (
     <DairyProvider>
-      <NavigationContainer>
+      <NavigationContainer 
+        linking={linking}
+        onReady={() => {
+          console.log('Navigation ready');
+        }}
+        onStateChange={(state) => {
+          console.log('Navigation state changed:', state);
+        }}
+      >
         <Stack.Navigator initialRouteName="Home">
           <Stack.Screen
             name="Home"
@@ -25,27 +66,37 @@ export default function App() {
           <Stack.Screen
             name="AddSupplier"
             component={AddSupplierScreen}
-            options={{ title: 'Add Supplier' }}
+            options={{ title: 'Add Supplier', headerShadowVisible: false }}
           />
           <Stack.Screen
             name="Suppliers"
             component={SupplierScreen}
-            options={{ title: 'Suppliers' }}
+            options={{ title: 'Suppliers', headerShadowVisible: false }}
           />
           <Stack.Screen
-            name="Daily Collection"
+            name="DailyCollection"
             component={DailyCollectionForm}
-            options={{ title: 'Daily Collection' }}
+            options={{ title: 'Daily Collection', headerShadowVisible: false }}
           />
           <Stack.Screen
             name="Report"
             component={ReportScreen}
-            options={{ title: 'Reports' }}
+            options={{ title: 'Reports', headerShadowVisible: false }}
           />
           <Stack.Screen
             name="AllCollections"
             component={AllCollection}
-            options={{ title: 'Collection' }}
+            options={{ title: 'Collection', headerShadowVisible: false }}
+          />
+          <Stack.Screen
+            name="QR"
+            component={SupplierDetails}
+            options={{ title: 'Details', headerShadowVisible: false }}
+          />
+          <Stack.Screen
+            name="QRS"
+            component={QRScanner}
+            options={{ title: 'Scanner', headerShadowVisible: false }}
           />
         </Stack.Navigator>
       </NavigationContainer>
