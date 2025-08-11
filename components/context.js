@@ -9,75 +9,69 @@ export const DairyProvider = ({ children }) => {
   const [suppliers, setSuppliers] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [phone, setPhone] = useState('');
 
-  // ✅ Fetch collections from Firebase
-  useEffect(() => {
-    const collectionsRef = ref(db, 'collections/');
+  const qrId = Date.now();
 
-    const unsubscribe = onValue(collectionsRef, (snapshot) => {
+  useEffect(() => {
+    let suppliersLoaded = false;
+    let collectionsLoaded = false;
+
+    const checkIfAllLoaded = () => {
+      if (suppliersLoaded && collectionsLoaded) {
+        setLoading(false);
+      }
+    };
+
+    // ✅ Fetch collections
+    const collectionsRef = ref(db, 'collections/');
+    const unsubCollections = onValue(collectionsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const loaded = Object.entries(data)
-          .map(([key, value]) => ({
-            id: key,
-            ...value,
-          }))
+          .map(([key, value]) => ({ id: key, ...value }))
           .reverse();
         setCollections(loaded);
       } else {
         setCollections([]);
       }
-      setLoading(false);
+      collectionsLoaded = true;
+      checkIfAllLoaded();
     });
 
-    return () => unsubscribe();
-  }, []);
-
-  // ✅ Fetch suppliers from Firebase (DO NOT overwrite IDs)
-  useEffect(() => {
+    // ✅ Fetch suppliers
     const suppliersRef = ref(db, 'suppliers/');
-
-    const unsubscribe = onValue(suppliersRef, (snapshot) => {
+    const unsubSuppliers = onValue(suppliersRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const loaded = Object.entries(data)
-          .map(([key, value]) => ({
-            id: key, // Firebase key used as ID
-            ...value,
-          }))
+          .map(([key, value]) => ({ id: key, ...value }))
           .reverse();
         setSuppliers(loaded);
       } else {
         setSuppliers([]);
       }
-      setLoading(false);
+      suppliersLoaded = true;
+      checkIfAllLoaded();
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubCollections();
+      unsubSuppliers();
+    };
   }, []);
- const qrId = Date.now();
-  // ✅ Add a new supplier locally with sequential ID
+
   const addSupplier = (supplier) => {
-    setSuppliers((prev) => {
-      
-
-      const newSupplier = {
-        ...supplier,
-      };
-
-      return [newSupplier, ...prev];
-    });
+    setSuppliers((prev) => [supplier, ...prev]);
   };
 
-  // ✅ Add a new collection locally
   const addCollection = (collection) => {
     setCollections((prev) => [collection, ...prev]);
   };
 
-  // ✅ Delete a collection from Firebase
   const Delete = (collection) => {
     Alert.alert(
       'Confirm Deletion',
@@ -102,46 +96,38 @@ export const DairyProvider = ({ children }) => {
     );
   };
 
-  // ✅ Delete a supplier from Firebase
-const Delete_Suppliers = (supplier) => {
-  if (!supplier || !supplier.id) {
-    Alert.alert('Invalid supplier', 'Supplier id is missing.');
-    console.warn('deleteSupplier called with invalid supplier:', supplier);
-    return;
-  }
+  const Delete_Suppliers = (supplier) => {
+    if (!supplier?.id) {
+      Alert.alert('Invalid supplier', 'Supplier id is missing.');
+      console.warn('deleteSupplier called with invalid supplier:', supplier);
+      return;
+    }
 
-  Alert.alert(
-    'Confirm Deletion',
-    `Are you sure you want to delete supplier "${supplier.name || supplier.id}"?`,
-    [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            const path = `suppliers/${supplier.id}`;
-            console.log('Attempting to delete:', path);
-
-            const itemRef = ref(db, path);
-
-            await remove(itemRef);
-
-            // Immediately update local state so UI reflects deletion
-            setSuppliers((prev) => prev.filter((s) => s.id !== supplier.id));
-
-            Alert.alert('Deleted', 'Supplier entry deleted successfully');
-            console.log('Deleted supplier at', path);
-          } catch (error) {
-            console.error('Failed to delete supplier:', error);
-            Alert.alert('Error', error.message || 'Failed to delete supplier');
-          }
+    Alert.alert(
+      'Confirm Deletion',
+      `Are you sure you want to delete supplier "${supplier.name || supplier.id}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const path = `suppliers/${supplier.id}`;
+              const itemRef = ref(db, path);
+              await remove(itemRef);
+              setSuppliers((prev) => prev.filter((s) => s.id !== supplier.id));
+              Alert.alert('Deleted', 'Supplier entry deleted successfully');
+            } catch (error) {
+              console.error('Failed to delete supplier:', error);
+              Alert.alert('Error', error.message || 'Failed to delete supplier');
+            }
+          },
         },
-      },
-    ],
-    { cancelable: false }
-  );
-};
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <DairyContext.Provider
@@ -160,7 +146,7 @@ const Delete_Suppliers = (supplier) => {
         setLoading,
         Delete,
         Delete_Suppliers,
-        qrId
+        qrId,
       }}
     >
       {children}

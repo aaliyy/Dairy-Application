@@ -15,7 +15,7 @@ export default function HomeScreen() {
     const totalAmount = collections.reduce((sum, item) => sum + Number(item.price || 0), 0);
 
   const recentCollection = collections.slice(0, 2);
-  if (loading) return <ActivityIndicator />;
+  if (loading) return <ActivityIndicator size={'large'} />;
   return (
     <View style={styles.container}>
       {/* Header */}

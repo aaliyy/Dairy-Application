@@ -29,38 +29,19 @@ export default function DailyCollectionForm({ route }) {
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
-      const items = suppliers.map((sup, index) => ({
+      const items = suppliers.map((sup) => ({
         label: sup.Supplier_name,
-        value: index.toString(),
+        value: sup.id.toString()
       }));
       setDropdownItems(items);
 
       // Auto-select supplier if came from QR code
       if (supplierId) {
-        console.log('QR supplierId received:', supplierId);
-        console.log('Available suppliers:', suppliers.map((s, i) => ({ 
-          index: i, 
-          id: s.id, 
-          name: s.Supplier_name 
-        })));
-
-        // Try multiple matching strategies
-        let supplierIndex = -1;
- 
-        supplierIndex = suppliers.findIndex(supplier => supplier.id?.toString() === supplierId?.toString());
-        
-       
-        console.log('Found supplier at index:', supplierIndex);
-
-        if (supplierIndex !== -1) {
-          setSelectedSupplier(supplierIndex.toString());
-          const foundSupplier = suppliers[supplierIndex];
-          
-          Alert.alert(
-            '✅ QR Code Scanned',
-            `Auto-selected: ${foundSupplier.Supplier_name}`,
-            [{ text: 'OK' }]
-          );
+        const matchedSupplier = suppliers.find(
+        supplier => supplier.id?.toString() === supplierId?.toString()
+      );
+        if (matchedSupplier) {
+          setSelectedSupplier(matchedSupplier.id.toString());
         } else {
           console.log('No matching supplier found for ID:', supplierId);
           Alert.alert(
@@ -79,7 +60,10 @@ const handleAdd = () => {
       return;
     }
 
-    const supplier = suppliers.find((_, idx) => idx.toString() === selectedSupplier);
+     const supplier = suppliers.find(
+      s => s.id?.toString() === selectedSupplier?.toString()
+    );
+
 
     if (!supplier || !supplier.Supplier_name) {
       Alert.alert('Error', 'Invalid supplier selected');
