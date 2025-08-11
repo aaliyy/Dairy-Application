@@ -141,7 +141,7 @@ export default function DailyCollectionForm({ route }) { // ✅ Add route parame
 
       <TextInput
         style={styles.input}
-        placeholder="Quantity (Liters)"
+        placeholder="Quantity ( Pounds)"
         keyboardType="numeric"
         value={quantity}
         onChangeText={setQuantity}
