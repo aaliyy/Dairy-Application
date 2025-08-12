@@ -14,9 +14,9 @@ import { useDairy } from './context';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 
-export default function DailyCollectionForm({ route }) {
+export default function DailyCollectionForm({ route }) { // ✅ Add route parameter
   const { suppliers } = useDairy();
-  const { supplierId } = route?.params || {};
+  const { supplierId } = route?.params || {}; // ✅ Get supplierId from QR deep link
 
   const [rate, setRate] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -28,42 +28,44 @@ export default function DailyCollectionForm({ route }) {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   useEffect(() => {
-    if (suppliers && suppliers.length > 0) {
-      const items = suppliers.map((sup) => ({
-        label: sup.Supplier_name,
-        value: sup.id.toString()
-      }));
-      setDropdownItems(items);
+    const items = suppliers.map((sup, index) => ({
+      label: sup.Supplier_name,
+      value: index.toString(),
+    }));
+    setDropdownItems(items);
 
-      // Auto-select supplier if came from QR code
-      if (supplierId) {
-        const matchedSupplier = suppliers.find(
-        supplier => supplier.id?.toString() === supplierId?.toString()
+    // ✅ Auto-select supplier if came from QR code
+    if (supplierId && suppliers.length > 0) {
+      // Find supplier by ID (assuming supplierId matches the supplier's ID or index)
+      const supplierIndex = suppliers.findIndex(
+        (supplier, index) => 
+          supplier.id === supplierId || 
+          supplier.Supplier_name === supplierId ||
+          index.toString() === supplierId
       );
-        if (matchedSupplier) {
-          setSelectedSupplier(matchedSupplier.id.toString());
-        } else {
-          console.log('No matching supplier found for ID:', supplierId);
-          Alert.alert(
-            '⚠️ QR Code Scanned',
-            `Supplier ID: ${supplierId}\nPlease select manually from the dropdown`,
-            [{ text: 'OK' }]
-          );
-        }
+
+      if (supplierIndex !== -1) {
+        setSelectedSupplier(supplierIndex.toString());
+        
+        // Show confirmation that QR code worked
+       
+      } else {
+        Alert.alert(
+          'QR Code Info',
+          `Supplier ID: ${supplierId} - Please select manually`,
+          [{ text: 'OK' }]
+        );
       }
     }
   }, [suppliers, supplierId]);
 
-const handleAdd = () => {
+  const handleAdd = () => {
     if (!selectedSupplier || !quantity || !fat || !rate) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
 
-     const supplier = suppliers.find(
-      s => s.id?.toString() === selectedSupplier?.toString()
-    );
-
+    const supplier = suppliers.find((_, idx) => idx.toString() === selectedSupplier);
 
     if (!supplier || !supplier.Supplier_name) {
       Alert.alert('Error', 'Invalid supplier selected');
@@ -74,13 +76,13 @@ const handleAdd = () => {
 
     const collectionData = {
       selectedSupplier: supplier.Supplier_name,
-      supplierId: supplierId || null,
+      supplierId: supplierId || null, // ✅ Store original supplierId if from QR
       quantity: parseFloat(quantity),
       fat: parseFloat(fat),
       rate: parseFloat(rate),
       price,
       date: date.toISOString(),
-      source: supplierId ? 'qr_code' : 'manual',
+      source: supplierId ? 'qr_code' : 'manual', // ✅ Track how entry was created
     };
 
     push(ref(db, 'collections/'), collectionData)
@@ -97,56 +99,34 @@ const handleAdd = () => {
         Alert.alert('Error', 'Failed to submit collection');
       });
   };
-  // Show loading state if suppliers haven't loaded yet
-  if (!suppliers || suppliers.length === 0) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text style={styles.loadingText}>Loading suppliers...</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Daily Collection Log</Text>
 
-      {/* Show QR scan indicator */}
-      <View style={styles.dropdownContainer}>
   
-        <DropDownPicker
-          open={dropdownOpen}
-          value={selectedSupplier}
-          items={dropdownItems}
-          setOpen={setDropdownOpen}
-          setValue={setSelectedSupplier}
-          setItems={setDropdownItems}
-          placeholder="Select Supplier"
-          style={{ 
-            borderColor: '#D1D5DB',
-            backgroundColor: supplierId ? '#f0f9ff' : '#fff',
-            minHeight: 50,
-          }}
-          dropDownContainerStyle={{ 
-            backgroundColor: '#fff',
-            borderColor: '#D1D5DB',
-          }}
-          textStyle={{
-            fontSize: 16,
-            color: '#111827',
-          }}
-          zIndex={3000}
-          zIndexInverse={1000}
-        />
-      </View>
 
-     
+      <DropDownPicker
+        open={dropdownOpen}
+        value={selectedSupplier}
+        items={dropdownItems}
+        setOpen={setDropdownOpen}
+        setValue={setSelectedSupplier}
+        setItems={setDropdownItems}
+        placeholder="Select Supplier"
+        containerStyle={{ marginBottom: 10 }}
+        style={{ 
+          borderColor: '#D1D5DB',
+          backgroundColor: supplierId ? '#f0f9ff' : '#fff' // ✅ Highlight if from QR
+        }}
+        dropDownContainerStyle={{ backgroundColor: '#fff' }}
+      />
+
       <TouchableOpacity
         style={styles.dateButton}
         onPress={() => setDatePickerVisibility(true)}
       >
-        <Text style={styles.dateButtonText}>
-          {moment(date).format('DD MMM, YYYY')}
-        </Text>
+        <Text>{moment(date).format('DD MMM, YYYY')}</Text>
       </TouchableOpacity>
 
       <DateTimePickerModal
@@ -157,92 +137,59 @@ const handleAdd = () => {
           setDatePickerVisibility(false);
         }}
         onCancel={() => setDatePickerVisibility(false)}
-        maximumDate={new Date()} // Prevent future dates
       />
 
-    
       <TextInput
         style={styles.input}
-        placeholder="Enter quantity in liters"
+        placeholder="Quantity (Liters)"
         keyboardType="numeric"
         value={quantity}
         onChangeText={setQuantity}
-        returnKeyType="next"
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Enter fat percentage (0-100)"
+        placeholder="Fat %"
         keyboardType="numeric"
         value={fat}
         onChangeText={setFat}
-        returnKeyType="next"
       />
 
-  
       <TextInput
         style={styles.input}
-        placeholder="Enter rate per liter"
+        placeholder="Rate per Liter"
         keyboardType="numeric"
         value={rate}
         onChangeText={setRate}
-        returnKeyType="done"
       />
 
-      {/* Show calculated price */}
-     
-
       <TouchableOpacity style={styles.button} onPress={handleAdd}>
-        <Text style={styles.buttonText}>Submit Collection</Text>
+        <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 20, 
-    backgroundColor: '#fff' 
-  },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
   heading: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#1F2937',
     marginBottom: 20,
-    textAlign: 'center',
   },
-  loadingText: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  qrBanner: {
+  qrBanner: { // ✅ New style for QR indicator
     backgroundColor: '#dbeafe',
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
-    borderLeftWidth: 4,
+    borderLeft: 4,
     borderLeftColor: '#3b82f6',
   },
   qrText: {
     color: '#1e40af',
     fontWeight: '500',
     textAlign: 'center',
-  },
-  dropdownContainer: {
-    marginBottom: 15,
-    zIndex: 3000,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
@@ -252,44 +199,19 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
     color: '#111827',
-    backgroundColor: '#fff',
-  },
-  dateButton: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    minHeight: 50,
-  },
-  dateButtonText: {
-    fontSize: 16,
-    color: '#111827',
-  },
-  priceContainer: {
-    backgroundColor: '#f3f4f6',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 15,
-    alignItems: 'center',
-  },
-  priceText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#059669',
   },
   button: {
     backgroundColor: '#22C55E',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
-    marginTop: 10,
   },
-  buttonText: { 
-    color: '#fff', 
-    fontWeight: '600', 
-    fontSize: 16 
+  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  dateButton: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 15,
   },
 });
