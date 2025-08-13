@@ -93,6 +93,7 @@ export default function HomeScreen() {
               <Text style={styles.listName}>{item.selectedSupplier}</Text>
               <Text style={styles.subtitle}>{item.quantity} L</Text>
               <Text>{new Date(item.date).toLocaleDateString('en-GB')}</Text>
+              <Text style={styles.subtitle}>{item.morningORevening}</Text>
               <Text style={styles.amount}>₹{item.price}</Text>
             </TouchableOpacity>
           )}
