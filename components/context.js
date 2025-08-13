@@ -84,11 +84,7 @@ export const DairyProvider = ({ children }) => {
           onPress: () => {
             const itemRef = ref(db, `collections/${collection.id}`);
             remove(itemRef)
-              .then(() => Alert.alert('Deleted', 'Collection entry deleted successfully'))
-              .catch((error) => {
-                console.error('Delete error:', error);
-                Alert.alert('Error', 'Failed to delete collection');
-              });
+    
           },
         },
       ],
