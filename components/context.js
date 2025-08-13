@@ -101,7 +101,7 @@ export const DairyProvider = ({ children }) => {
 
     Alert.alert(
       'Confirm Deletion',
-      `Are you sure you want to delete supplier "${supplier.name || supplier.id}"?`,
+      `Are you sure you want to delete this supplier ?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -113,7 +113,6 @@ export const DairyProvider = ({ children }) => {
               const itemRef = ref(db, path);
               await remove(itemRef);
               setSuppliers((prev) => prev.filter((s) => s.id !== supplier.id));
-              Alert.alert('Deleted', 'Supplier entry deleted successfully');
             } catch (error) {
               console.error('Failed to delete supplier:', error);
               Alert.alert('Error', error.message || 'Failed to delete supplier');

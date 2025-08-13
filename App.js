@@ -9,9 +9,11 @@ import DailyCollectionForm from './components/collection';
 import ReportScreen from './components/Report';
 import AllCollection from './components/AllCollection';
 import SupplierDetails from './components/QR';
-import QRScanner from './components/scanner';
-
+import graph from './components/graph';
+import scanner from './components/scanner';
 import { DairyProvider } from './components/context';
+import Dues from './components/Dues'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,15 +49,10 @@ export default function App() {
   };
 
   return (
+    <GestureHandlerRootView>
     <DairyProvider>
       <NavigationContainer 
-        linking={linking}
-        onReady={() => {
-          console.log('Navigation ready');
-        }}
-        onStateChange={(state) => {
-          console.log('Navigation state changed:', state);
-        }}
+        linking={linking}        
       >
         <Stack.Navigator initialRouteName="Home">
           <Stack.Screen
@@ -74,7 +71,7 @@ export default function App() {
             options={{ title: 'Suppliers', headerShadowVisible: false }}
           />
           <Stack.Screen
-            name="DailyCollection"
+            name="Daily Collection"
             component={DailyCollectionForm}
             options={{ title: 'Daily Collection', headerShadowVisible: false }}
           />
@@ -94,12 +91,24 @@ export default function App() {
             options={{ title: 'Details', headerShadowVisible: false }}
           />
           <Stack.Screen
-            name="QRS"
-            component={QRScanner}
-            options={{ title: 'Scanner', headerShadowVisible: false }}
+            name="graph"
+            component={graph}
+            options={{ title: 'Graph', headerShadowVisible: false }}
           />
+          <Stack.Screen
+            name="Due"
+            component={Dues}
+            options={{ title: 'Due', headerShadowVisible: false }}
+          />
+           <Stack.Screen
+            name="scanner"
+            component={scanner}
+            options={{ title: 'scanner', headerShadowVisible: false }}
+          />
+          
         </Stack.Navigator>
       </NavigationContainer>
     </DairyProvider>
+    </GestureHandlerRootView>
   );
 }

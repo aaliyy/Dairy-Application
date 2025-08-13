@@ -40,27 +40,11 @@ export default function QRCodeScanner() {
     // ✅ If deep link for Dairy App
     if (data.startsWith('dairyapp://daily-collection/')) {
       const supplierId = data.replace('dairyapp://daily-collection/', '');
-      navigation.navigate('DailyCollection', { supplierId });
+      navigation.navigate('Daily Collection', { supplierId });
       return;
     }
 
-    // Otherwise normal handling
-    Alert.alert(
-      'QR Code Scanned!',
-      `Type: ${type}\nData: ${data}`,
-      [
-        {
-          text: 'Open Link',
-          onPress: () => handleOpenLink(data),
-          style: 'default',
-        },
-        {
-          text: 'Scan Again',
-          onPress: () => setScanned(false),
-          style: 'cancel',
-        },
-      ]
-    );
+    
   };
 
   const handleOpenLink = async (data) => {
