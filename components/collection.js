@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Pressable
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { db } from '../firebase';
@@ -70,6 +71,13 @@ const handleAdd = () => {
       return;
     }
 
+    const morningORevening = () => {
+      if (date.getHours() < 12) {
+        return 'Morning';
+      }
+      return 'Evening';
+    }
+
     const price = parseFloat(rate) * parseFloat(quantity);
 
     const collectionData = {
@@ -81,6 +89,7 @@ const handleAdd = () => {
       price,
       date: date.toISOString(),
       source: supplierId ? 'qr_code' : 'manual',
+      morningORevening: morningORevening(),
     };
 
     push(ref(db, 'collections/'), collectionData)
@@ -90,6 +99,7 @@ const handleAdd = () => {
         setFat('');
         setSelectedSupplier(null);
         setDate(new Date());
+        morningORevening();
         Alert.alert('Success', 'Collection submitted');
       })
       .catch((error) => {
