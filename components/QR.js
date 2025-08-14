@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { Linking } from 'react-native';
+
 
 export default function SupplierDetails({ route }) {
   // Get parameters - you might pass supplierIndex for more reliable matching
@@ -10,49 +10,19 @@ export default function SupplierDetails({ route }) {
   // Use index if available (most reliable), otherwise use supplierId
   const qrValue = `dairyapp://daily-collection/${supplierIndex !== undefined ? supplierIndex : supplierId}`;
 
-  // Test deep link functionality
-  const testDeepLink = () => {
-    console.log('Testing deep link:', qrValue);
-    
-    Linking.canOpenURL(qrValue).then((supported) => {
-      if (supported) {
-        Alert.alert(
-          'Deep Link Test',
-          `URL: ${qrValue}\n\nThis will open the Daily Collection screen.`,
-          [
-            { text: 'Cancel' },
-            { text: 'Test', onPress: () => Linking.openURL(qrValue) }
-          ]
-        );
-      } else {
-        Alert.alert('Error', 'Cannot open this URL scheme');
-      }
-    });
-  };
+
 
   return (
     <View style={styles.container}>
+
       <Text style={styles.title}>Supplier QR Code</Text>
       
       {supplierName && (
         <Text style={styles.supplierName}>{supplierName}</Text>
       )}
-      
-      <Text style={styles.supplierId}>
-        ID: {supplierId}
-        {supplierIndex !== undefined && ` (Index: ${supplierIndex})`}
-      </Text>
-      
       <View style={styles.qrContainer}>
         <QRCode value={qrValue} size={300} />
       </View>
-      
-      <Text style={styles.qrText}>{qrValue}</Text>
-      
-      <TouchableOpacity style={styles.testButton} onPress={testDeepLink}>
-        <Text style={styles.testButtonText}>Test Deep Link</Text>
-      </TouchableOpacity>
-      
       <Text style={styles.instructionText}>
         Scan with your phone's camera or any QR scanner app
       </Text>

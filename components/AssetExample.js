@@ -126,7 +126,7 @@ export default function HomeScreen() {
             style={[styles.actionButton, styles.greenButton]}
             onPress={() => navigation.navigate('Due')}
           >
-            <Text style={styles.darkButtonText}>Dues</Text>
+            <Text style={styles.buttonText}>Dues</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -150,6 +150,7 @@ export default function HomeScreen() {
               <View style={styles.listCard}>
                 <Text style={styles.listName}>{item.selectedSupplier}</Text>
                 <Text style={styles.subtitle}>{item.quantity} L</Text>
+                <Text style={styles.subtitle}>{item.morningORevening} </Text>
                 <Text>{new Date(item.date).toLocaleDateString('en-GB')}</Text>
                 <Text style={styles.amount}>₹{item.price}</Text>
               </View>
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     padding: 12,
     borderRadius: 12,
-    marginBottom: 8
+    marginBottom: 8,
   },
   listName: { fontWeight: '600', fontSize: 14, color: '#111827' },
   amount: { fontWeight: 'bold', color: '#16A34A', textAlign: 'right', marginTop: 4 },

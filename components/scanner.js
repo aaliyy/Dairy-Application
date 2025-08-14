@@ -8,6 +8,7 @@ import {
   Linking,
   Vibration,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
@@ -41,7 +42,7 @@ export default function QRCodeScanner() {
     if (data.startsWith('dairyapp://daily-collection/')) {
       const supplierId = data.replace('dairyapp://daily-collection/', '');
       navigation.navigate('Daily Collection', { supplierId });
-      return;
+     
     }
 
     

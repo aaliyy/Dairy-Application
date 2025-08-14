@@ -6,6 +6,8 @@ import { useDairy } from './context';
 import { db } from '../firebase';
 import { ref, onValue } from 'firebase/database';
 import moment from 'moment';
+import { printToFileAsync } from 'expo-print';
+import { shareAsync } from 'expo-sharing';
 
 export default function ReportScreen() {
   const { suppliers } = useDairy();
@@ -29,6 +31,9 @@ export default function ReportScreen() {
   }));
 
   const [filteredData, setFilteredData] = useState([]);
+
+  
+
 
   const handleGenerateReport = () => {
     if (!supplierValue || !startDate || !endDate || !reportValue) {
@@ -69,6 +74,87 @@ export default function ReportScreen() {
   const totalMilk = filteredData.reduce((sum, item) => sum + (item.quantity || 0), 0);
   const totalFat = filteredData.reduce((sum, item) => sum + (item.fat || 0), 0);
   const totalAmount = filteredData.reduce((sum, item) => sum + Number(item.price || 0), 0);
+
+  // Build table rows dynamically from filteredData
+const tableRows = filteredData.map(item => `
+  <tr>
+    <td>${moment(item.date).format('DD/MM/YYYY')}</td>
+    <td>${item.quantity || '-'}</td>
+    <td>${item.fat || '-'}</td>
+    <td>${item.price || '-'}</td>
+  </tr>
+`).join('');
+
+const html = `
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background-color: #f4f4f4;
+      }
+      tfoot td {
+        font-weight: bold;
+        background-color: #f9f9f9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Report for ${supplierValue}</h1>
+    <p><strong>Report Type:</strong> ${reportValue}</p>
+    <p><strong>Date Range:</strong> ${moment(startDate).format('DD MMM YYYY')} - ${moment(endDate).format('DD MMM YYYY')}</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Milk (Liters)</th>
+          <th>Fat (%)</th>
+          <th>Price (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Total</td>
+          <td>${totalMilk}</td>
+          <td>${totalFat.toFixed(2)}</td>
+          <td>₹${totalAmount}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </body>
+</html>
+`;
+
+  const GeneratePdf =async ()=>{
+      const file = await printToFileAsync({
+        html: html,
+        base64:false
+      })
+      await shareAsync(file.uri);
+  }
+
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -166,6 +252,10 @@ export default function ReportScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: 16 }}
         renderItem={({ item }) => (
+          <View style={{ marginBottom: 12 }}>
+            <TouchableOpacity style={styles.button} onPress={GeneratePdf}>
+            <Text style={styles.buttonText}>Generate PDF</Text>
+          </TouchableOpacity>
           <View style={styles.reportCard}>
             <Text style={styles.cardText}>Date: {moment(item.date).format('DD/MM/YYYY')}</Text>
             <Text style={styles.cardText}>
@@ -173,6 +263,7 @@ export default function ReportScreen() {
                 ? `Milk: ${item.quantity} Liters`
                 : `Fat%: ${item.fat}`}
             </Text>
+          </View>
           </View>
         )}
       />

@@ -9,7 +9,7 @@ export const DairyProvider = ({ children }) => {
   const [suppliers, setSuppliers] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [phone, setPhone] = useState('');
