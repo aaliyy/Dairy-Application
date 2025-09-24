@@ -1,18 +1,21 @@
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Linking, Alert } from 'react-native'; // ✅ Add these imports
-import HomeScreen from './components/AssetExample';
-import AddSupplierScreen from './components/hello';
-import SupplierScreen from './components/Suppliers';
-import DailyCollectionForm from './components/collection';
-import ReportScreen from './components/Report';
-import AllCollection from './components/AllCollection';
-import SupplierDetails from './components/QR';
-import graph from './components/graph';
-import scanner from './components/scanner';
-import { DairyProvider } from './components/context';
-import Dues from './components/Dues'
+import HomeScreen from './src/Screens/User/AssetExample';
+import AddSupplierScreen from './src/Screens/Suppliers/hello';
+import SupplierScreen from './src/Screens/Suppliers/Suppliers';
+import DailyCollectionForm from './src/Screens/Collections/collection';
+import ReportScreen from './src/Screens/Report/Report';
+import AllCollection from './src/Screens/Collections/AllCollection';
+import SupplierDetails from './src/Screens/Suppliers/SuppliersDetails';
+import Header from './src/components/header';
+import scanner from './src/Screens/Collections/scanner';
+import { DairyProvider } from './src/components/context';
+import UserPage from './src/Screens/User/Profile'; 
+import ViewReport from './src/Screens/Report/ViewReport';
+import CollectionItem from './src/components/CollectionItem';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();
@@ -24,7 +27,6 @@ export default function App() {
     Linking.getInitialURL().then((url) => {
       if (url) {
         console.log('App opened with URL:', url);
-       
       }
     });
 
@@ -33,7 +35,6 @@ export default function App() {
       console.log('Deep link received while app running:', url);
       Alert.alert('Deep Link Debug', `Received: ${url}`);
     });
-
     return () => subscription?.remove();
   }, []);
 
@@ -54,26 +55,26 @@ export default function App() {
       <NavigationContainer 
         linking={linking}        
       >
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown:false ,}}>
           <Stack.Screen
             name="Home"
             component={HomeScreen}
-            options={{ headerShown: false }}
+            options={{ headerShown: false,  animation: Platform.OS === 'ios' ? 'ios_from_left' : 'slide_from_left',  }}
           />
           <Stack.Screen
             name="AddSupplier"
             component={AddSupplierScreen}
-            options={{ title: 'Add Supplier', headerShadowVisible: false }}
+            options={{ title: 'Add Supplier', headerShadowVisible: false, headerShown:true }}
           />
           <Stack.Screen
             name="Suppliers"
             component={SupplierScreen}
-            options={{ title: 'Suppliers', headerShadowVisible: false }}
+            options={{ title: 'Suppliers', headerShadowVisible: false,  }}
           />
           <Stack.Screen
             name="Daily Collection"
             component={DailyCollectionForm}
-            options={{ title: 'Daily Collection', headerShadowVisible: false }}
+            options={{ title: 'Daily Collection', headerShadowVisible: false, }}
           />
           <Stack.Screen
             name="Report"
@@ -91,13 +92,13 @@ export default function App() {
             options={{ title: 'Details', headerShadowVisible: false }}
           />
           <Stack.Screen
-            name="graph"
-            component={graph}
-            options={{ title: 'Graph', headerShadowVisible: false }}
+            name="Header"
+            component={Header}
+            options={{ headerShadowVisible: false }}
           />
           <Stack.Screen
-            name="Due"
-            component={Dues}
+            name="UserPage"
+            component={UserPage}
             options={{ title: 'Due', headerShadowVisible: false }}
           />
            <Stack.Screen
@@ -105,7 +106,17 @@ export default function App() {
             component={scanner}
             options={{ title: 'scanner', headerShadowVisible: false }}
           />
-          
+           <Stack.Screen
+            name="ViewReport"
+            component={ViewReport}
+            options={{ title: 'View Report', headerShadowVisible: false , headerShown:true }}
+          />
+          <Stack.Screen
+          name='CollectionItem'
+          component={CollectionItem} 
+          options={{ title: 'Collection Item', headerShadowVisible: false , headerShown:true }}
+          />
+
         </Stack.Navigator>
       </NavigationContainer>
     </DairyProvider>

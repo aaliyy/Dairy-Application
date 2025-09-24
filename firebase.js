@@ -15,7 +15,6 @@ const firebaseConfig = {
   messagingSenderId: "748424833642",
   appId: "1:748424833642:web:b20a4b6048bbb2da807813",
   measurementId: "G-NW5HKB8VKR",
-
   databaseURL: "https://salmandairy-4c0a0-default-rtdb.asia-southeast1.firebasedatabase.app",
 };
 
