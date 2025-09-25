@@ -9,6 +9,7 @@ export const DairyProvider = ({ children }) => {
   const [suppliers, setSuppliers] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCollection, setSelectedCollection] = useState(null);
   
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
@@ -142,6 +143,8 @@ export const DairyProvider = ({ children }) => {
         Delete,
         Delete_Suppliers,
         qrId,
+        selectedCollection,
+        setSelectedCollection,
       }}
     >
       {children}

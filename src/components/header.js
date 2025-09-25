@@ -12,13 +12,6 @@ const Header = () => {
 
   return (
     <View style={{
-    borderWidth:1,
-    borderColor:'#d3d3d3',
-    shadowColor: '#d3d3d3',
-    shadowOpacity: 5,
-    shadowOffset: { width: 0, height: 5 },
-    shadowRadius: 20,
-    elevation: 5,
     borderRadius:20,
     marginBottom: 16
     }}>

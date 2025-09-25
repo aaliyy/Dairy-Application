@@ -51,7 +51,7 @@ export default function ReportScreen({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
          <StatusBar hidden={true} />
-      <TouchableOpacity onPress={ ()=>navigation.navigate('Home') } style={{ marginTop: 30,margin:10, marginBottom:2, }}>
+      <TouchableOpacity onPress={ ()=>navigation.goBack() } style={{ marginTop: 30,margin:10, marginBottom:2, }}>
   <Ionicons name="arrow-back" size={24} color="black" />
 </TouchableOpacity>
       <View style={styles.toggleContainer}>

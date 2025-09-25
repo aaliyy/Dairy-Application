@@ -56,7 +56,7 @@ export default function SupplierScreen() {
   return (
     <View style={styles.container}>
          <StatusBar hidden={true} />
-       <TouchableOpacity onPress={ ()=>navigation.navigate('Home') } style={{ marginTop: 25, marginBottom:5, }}>
+       <TouchableOpacity onPress={ ()=>navigation.goBack() } style={{ marginTop: 25, marginBottom:5, }}>
               <Ionicons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
       <TextInput

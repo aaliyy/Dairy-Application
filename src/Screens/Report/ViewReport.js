@@ -136,7 +136,7 @@ export default function ViewReportScreen({ route }) {
             <tr>
               <td colspan="2">Total</td>
               <td>${totalMilk}</td>
-              <td>${totalFat.toFixed(2)}</td>
+              <td>${(totalFat/ deliveriesCount()).toFixed(2)} % </td>
               <td>₹${totalAmount}</td>
             </tr>
           </tfoot>
@@ -197,7 +197,7 @@ export default function ViewReportScreen({ route }) {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white', padding:14, paddingBottom:25, }}>
         <StatusBar hidden={true} />
       <FlatList
         data={supplierValue ? filteredData : Object.entries(filteredData)}

@@ -78,12 +78,14 @@ export default function HomeScreen() {
             <Text style={[styles.subtitle, { color: '#3B82F6' }]}>View All</Text>
           </TouchableOpacity>
         </View>
+        <View style={{backgroundColor: '#fff',borderRadius:12,}}>
         <FlatList
           data={recentCollection}
           renderItem={({ item }) => (<CollectionItem item={item} />)}
           keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ }}
         />
+        </View>
       </View>
       <TouchableOpacity
         style={styles.fab}

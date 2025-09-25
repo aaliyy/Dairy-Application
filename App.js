@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
-import { Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform,ActivityIndicator,View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Linking, Alert } from 'react-native'; // ✅ Add these imports
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import HomeScreen from './src/Screens/User/AssetExample';
 import AddSupplierScreen from './src/Screens/Suppliers/hello';
 import SupplierScreen from './src/Screens/Suppliers/Suppliers';
@@ -17,7 +18,8 @@ import UserPage from './src/Screens/User/Profile';
 import ViewReport from './src/Screens/Report/ViewReport';
 import CollectionItem from './src/components/CollectionItem';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
+import LoginScreen from './src/Screens/User/Login';
+import Toast from "react-native-toast-message";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -48,6 +50,24 @@ export default function App() {
       },
     },
   };
+  const [initialRoute, setInitialRoute] = useState(null); // determine first screen
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+      setInitialRoute(isLoggedIn ? "Home" : "Login");
+    };
+    checkLogin();
+  }, []);
+
+  if (!initialRoute) {
+    // show loading until we check login status
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
+    );
+  }
 
   return (
     <GestureHandlerRootView>
@@ -55,7 +75,8 @@ export default function App() {
       <NavigationContainer 
         linking={linking}        
       >
-        <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown:false ,}}>
+        <Stack.Navigator initialRouteName={initialRoute} screenOptions={{headerShown:false ,}}>
+          <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen
             name="Home"
             component={HomeScreen}
@@ -118,6 +139,7 @@ export default function App() {
           />
 
         </Stack.Navigator>
+           <Toast />
       </NavigationContainer>
     </DairyProvider>
     </GestureHandlerRootView>

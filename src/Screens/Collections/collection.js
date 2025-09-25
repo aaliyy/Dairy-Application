@@ -121,7 +121,7 @@ const handleAdd = () => {
   return (
     <View style={styles.container}>
    <StatusBar hidden={true} />
-<TouchableOpacity onPress={ ()=>navigation.navigate('Home') } style={{ marginTop: 20, marginBottom:10, }}>
+<TouchableOpacity onPress={ ()=>navigation.goBack() } style={{ marginTop: 20, marginBottom:10, }}>
   <Ionicons name="arrow-back" size={24} color="black" />
 </TouchableOpacity>
       {/* Show QR scan indicator */}

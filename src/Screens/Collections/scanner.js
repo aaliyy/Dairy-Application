@@ -103,7 +103,7 @@ export default function QRCodeScanner() {
         <View style={styles.overlay}>
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity style={styles.flashButton} onPress={()=>navigation.navigate('Home')} >
+            <TouchableOpacity style={styles.flashButton} onPress={()=>navigation.goBack()} >
               <Entypo name="cross" size={24} color="white" />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleTorch} style={styles.flashButton}>
