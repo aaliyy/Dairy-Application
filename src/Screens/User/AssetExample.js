@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,142 +6,106 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
-  Animated,
-  StatusBar
+  StatusBar,
 } from 'react-native';
-import { Ionicons, AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Swipeable } from 'react-native-gesture-handler';
 import { useDairy } from '../../components/context';
 import Header from '../../components/header';
 import CollectionItem from '../../components/CollectionItem';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const { collections,  loading,  } = useDairy();
+  const { collections, loading } = useDairy();
 
+  const [greeting, setGreeting] = useState('');
 
+  useEffect(() => {
+    const hours = new Date().getHours();
+    if (hours < 12) {
+      setGreeting('Good Morning');
+    } else if (hours < 18) {
+      setGreeting('Good Afternoon');
+    } else {
+      setGreeting('Good Evening');
+    }
+  }, []);
 
-  const recentCollection = collections.slice(0, 2);
-  if (loading) return <ActivityIndicator style={{alignSelf:'center', justifyContent:'center'}} />;
+  const recentCollection = collections.slice(0, 4); // show top 4
 
- 
+  if (loading) {
+    return (
+      <ActivityIndicator
+        style={{ alignSelf: 'center', justifyContent: 'center', flex: 1 }}
+        size="large"
+        color="#3B82F6"
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <StatusBar hidden={true} />
-      <View style={styles.header}>
+
+      {/* Top User Greeting */}
+      <View style={styles.topHeader}>
         <View>
-          <Text style={styles.title}>Salman Dairy</Text>
-          <Text style={styles.subtitle}>Collection Center</Text>
+          <Text style={styles.greeting}>{greeting}</Text>
+          <Text style={styles.username}>Rajesh Kumar</Text>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('UserPage')}>
-        <Ionicons name="person-circle-outline" size={32} color="gray" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Overview Card */}
-     <Header />
-
-      {/* Quick Actions */}
-      <View style={styles.quickActionsContainer}>
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <View style={styles.statsRow}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.blueButton]}
-            onPress={() => navigation.navigate('Suppliers')}
-          >
-            <Text style={styles.darkButtonText}>Suppliers</Text>
-          </TouchableOpacity>
-        <TouchableOpacity
-            style={[styles.actionButton, styles.yellowButton]}
-            onPress={() => navigation.navigate('Daily Collection')}
-          >
-            <Text style={styles.buttonText}>Add Collection</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.statsRow}>
-          
-          <TouchableOpacity
-            style={[styles.actionButton, styles.grayButton]}
-            onPress={() => navigation.navigate('Report')}
-          >
-            <Text style={styles.darkButtonText}>Reports</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Ionicons
+            name="notifications-outline"
+            size={24}
+            color="#374151"
+            style={{ marginRight: 12 }}
+          />
+          <TouchableOpacity onPress={() => navigation.navigate('UserPage')}>
+            <Ionicons name="person-circle-outline" size={38} color="#3B82F6" />
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.quickActionsContainer}>
-        <View style={styles.statsRow}>
+
+      {/* Overview */}
+      <Header />
+
+      {/* Recent Collections */}
+      <View style={styles.section}>
+        <View style={styles.rowBetween}>
           <Text style={styles.sectionTitle}>Recent Collections</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('AllCollections')}>
-            <Text style={[styles.subtitle, { color: '#3B82F6' }]}>View All</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('AllCollections')}
+          >
+            <Text style={styles.viewAll}>View All</Text>
           </TouchableOpacity>
         </View>
-        <View style={{backgroundColor: '#fff',borderRadius:12,}}>
+
         <FlatList
           data={recentCollection}
-          renderItem={({ item }) => (<CollectionItem item={item} />)}
+          renderItem={({ item }) => <CollectionItem item={item} />}
           keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={{ }}
+          contentContainerStyle={{ marginTop: 8 }}
         />
-        </View>
       </View>
-      <TouchableOpacity
-        style={styles.fab}
-        activeOpacity={0.7}
-         onPress={() => {
-              navigation.navigate('scanner');
-            }}
-      >
-      <MaterialIcons name="qr-code-scanner" size={32} color="#fff" />
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9f9f7', padding: 16, paddingTop: 40 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
-  title: { fontSize: 18, fontWeight: 'bold', color: '#374151' },
-   statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
-  quickActionsContainer: { marginBottom: 16 },
-  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#1F2937', marginBottom: 8 },
-  actionButton: {
-    padding: 16,
-    borderRadius: 12,
-    width: '48%',
-    alignItems: 'center'
-  },
-  greenButton: { backgroundColor: '#22C55E' },
-  blueButton: { backgroundColor: '#BFDBFE' },
-  yellowButton: { backgroundColor: '#FACC15' },
-  grayButton: { backgroundColor: '#F3F4F6' },
-  buttonText: { color: '#fff', fontWeight: '600' },
-  darkButtonText: { color: '#111827', fontWeight: '600' },
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
-    backgroundColor: '#22C55E',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
+  container: { flex: 1, backgroundColor: '#f9fafb', padding: 16, paddingTop: 40 },
+
+  topHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    alignSelf:'center',
-    elevation: 5
+    marginBottom: 16,
   },
-  smallFab: {
-    position: 'absolute',
-    right: 30,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4
-  },
- 
-   
+  greeting: { fontSize: 20, fontWeight: '700', color: '#111827' },
+  username: { fontSize: 14, color: '#6b7280', marginTop: 2 },
+
+  section: { marginTop: 16 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#1f2937' },
+  viewAll: { fontSize: 14, color: '#3B82F6', fontWeight: '500' },
+
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
 });

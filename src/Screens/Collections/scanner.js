@@ -15,7 +15,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-const { width, height } = Dimensions.get('window');
 
 export default function QRCodeScanner() {
   const [hasPermission, setHasPermission] = useState(null);

@@ -1,27 +1,26 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Pressable,StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Pressable, StatusBar } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import moment from 'moment';
 import { useDairy } from '../../components/context';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons,FontAwesome } from '@expo/vector-icons';
 
 export default function ReportScreen({ navigation }) {
   const { suppliers } = useDairy();
 
   const [isToday, setIsToday] = useState(true);
-  const [reportOpen, setReportOpen] = useState(false);
-  const [reportValue, setReportValue] = useState(null);
-  const [reportItems, setReportItems] = useState([
-    { label: 'Milk', value: 'milk' },
-    { label: 'Fat%', value: 'fat' },
-  ]);
 
+  // Report type dropdown
+ 
+
+  // Date pickers
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
 
+  // Supplier dropdown
   const [supplierOpen, setSupplierOpen] = useState(false);
   const [supplierValue, setSupplierValue] = useState(null);
   const items = suppliers.map((sup) => ({
@@ -29,83 +28,66 @@ export default function ReportScreen({ navigation }) {
     value: sup.Supplier_name,
   }));
 
+  // Morning/Evening toggle
+// null = all, 'morning' = morning, 'evening' = evening
+const [timeFilterValue, setTimeFilterValue] = useState(null);
+
+
   const handleSingleDay = (value) => {
     setIsToday(value);
   };
 
   const handleGenerateReport = () => {
-    if (!startDate || !endDate || !reportValue) {
+    if (!startDate || !endDate ) {
       alert('Please select date range and report type');
       return;
     }
 
-    // Navigate to ViewReportScreen and pass filters as params
     navigation.navigate('ViewReport', {
       startDate,
       endDate,
-      reportValue,
       supplierValue,
+      timeFilterValue,
+      isToday
     });
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
-         <StatusBar hidden={true} />
-      <TouchableOpacity onPress={ ()=>navigation.goBack() } style={{ marginTop: 30,margin:10, marginBottom:2, }}>
-  <Ionicons name="arrow-back" size={24} color="black" />
-</TouchableOpacity>
+      <StatusBar hidden={true} />
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 30, margin: 10, marginBottom: 2 }}>
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+
+      {/* Single Day / Multi-Day toggle */}
       <View style={styles.toggleContainer}>
-        <Pressable
-          onPress={() =>handleSingleDay(true)}
-          style={[styles.toggleButton, isToday && styles.toggleActive]}>
-          <Text style={[styles.toggleText, { color: isToday ? 'black' : 'grey' }]}>Single Day</Text>
+        <Pressable onPress={() => handleSingleDay(true)} style={[styles.toggleButton, isToday && styles.toggleActive]}>
+          <Text style={[styles.toggleText, { color: isToday ? '#3B82F6' : 'grey' }]}>Single Day</Text>
         </Pressable>
-        <Pressable
-          onPress={() =>handleSingleDay(false)}
-          style={[styles.toggleButton, !isToday && styles.toggleActive]}>
-          <Text style={[styles.toggleText, { color: !isToday ? 'black' : 'grey' }]}>Multi-Day</Text>
+        <Pressable onPress={() => handleSingleDay(false)} style={[styles.toggleButton, !isToday && styles.toggleActive]}>
+          <Text style={[styles.toggleText, { color: !isToday ? '#3B82F6' : 'grey' }]}>Multi-Day</Text>
         </Pressable>
       </View>
 
       <Text style={styles.title}>Generate Reports</Text>
 
       {/* Report Type Dropdown */}
-      <View style={{ zIndex: 3000, margin: 10 }}>
-        <DropDownPicker
-          open={reportOpen}
-          value={reportValue}
-          items={reportItems}
-          setOpen={setReportOpen}
-          setValue={setReportValue}
-          setItems={setReportItems}
-          placeholder="Select Report Type"
-          style={styles.dropdown}
-          dropDownContainerStyle={styles.dropdownBox}
-          placeholderStyle={styles.placeholder}
-        />
-      </View>
-
+      
       {/* Date Pickers */}
       {!isToday && (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10 }}>
-          <TouchableOpacity
-            style={styles.dateButton}
-            onPress={() => setStartDatePickerVisibility(true)}>
+          <TouchableOpacity style={styles.dateButton} onPress={() => setStartDatePickerVisibility(true)}>
             <Text>{startDate ? moment(startDate).format('DD MMM, YYYY') : 'Start Date'}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.dateButton}
-            onPress={() => setEndDatePickerVisibility(true)}>
+          <TouchableOpacity style={styles.dateButton} onPress={() => setEndDatePickerVisibility(true)}>
             <Text>{endDate ? moment(endDate).format('DD MMM, YYYY') : 'End Date'}</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {isToday && (
-        <TouchableOpacity
-          style={[styles.dateButtonS, { marginHorizontal: 16 }]}
-          onPress={() => setEndDatePickerVisibility(true)}>
+        <TouchableOpacity style={[styles.dateButtonS, { marginHorizontal: 16 }]} onPress={() => setEndDatePickerVisibility(true)}>
           <Text>{endDate ? moment(endDate).format('DD MMM, YYYY') : 'Select Date'}</Text>
         </TouchableOpacity>
       )}
@@ -146,8 +128,41 @@ export default function ReportScreen({ navigation }) {
         />
       </View>
 
+      {/* Morning / Evening toggle */}
+      <View style={styles.toggleContainers}>
+  <TouchableOpacity
+    onPress={() => setTimeFilterValue('morning')}
+    style={[styles.toggleButtons, timeFilterValue === 'morning' && styles.toggleActives]}>
+       <Ionicons name="sunny" size={16} color={"#6B7280"} />
+    <Text style={[styles.toggleTexts, timeFilterValue === 'morning' && styles.toggleTextActives]}>
+      Morning
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    onPress={() => setTimeFilterValue('evening')}
+    style={[styles.toggleButtons, timeFilterValue === 'evening' && styles.toggleActives]}>
+      <Ionicons name="moon" size={16} color={"#6B7280"} />
+    <Text style={[styles.toggleTexts, timeFilterValue === 'evening' && styles.toggleTextActives]}>
+      Evening
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    onPress={() => setTimeFilterValue(null)}
+    style={[styles.toggleButtonsa, timeFilterValue === null && styles.toggleActives]}>
+    <Text style={[styles.toggleTexts, timeFilterValue === null && styles.toggleTextActives]}>
+      All
+    </Text>
+  </TouchableOpacity>
+</View> 
+
+
       <TouchableOpacity style={styles.button} onPress={handleGenerateReport}>
-        <Text style={styles.buttonText}>Generate Report</Text>
+        <FontAwesome name="file-text" size={24} color="#fff" />
+        <View style={{marginLeft:20,}}>
+        <Text style={styles.buttonText}>Get Report</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -177,12 +192,20 @@ const styles = StyleSheet.create({
   },
   button: {
     marginHorizontal: 16,
-    backgroundColor: '#22C55E',
-    height: 48,
+    backgroundColor: '#3B82F6',
+    height: 56,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
+    shadowColor:'#3B82F6',
+    shadowOpacity: 1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 3,
+    flexDirection:'row',
+    width:'95%',
+    alignSelf:'center',
   },
   buttonText: {
     color: '#fff',
@@ -191,7 +214,7 @@ const styles = StyleSheet.create({
   },
   dateButton: {
     flex: 1,
-    height: 48,
+    height: 56,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -201,8 +224,8 @@ const styles = StyleSheet.create({
     borderColor: '#dce5dc',
     borderWidth: 1,
   },
-   dateButtonS : {
-    height: 48,
+  dateButtonS: {
+    height: 56,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -211,27 +234,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
     borderColor: '#dce5dc',
     borderWidth: 1,
-  },
-  reportCard: {
-    backgroundColor: '#f3fef3',
-    padding: 16,
-    borderRadius: 12,
-    marginVertical: 6,
-    borderColor: '#c4f3c4',
-    borderWidth: 1,
-  },
-  cardText: {
-    fontSize: 16,
-    color: '#333',
+    width:'95%',
+    alignSelf:'center'
   },
   toggleContainer: {
     flexDirection: 'row',
-    width: '90%',
+    width: '95%',
     borderWidth: 1,
-    borderColor: '#d3d3d3',
-    padding: 5,
-    borderRadius: 20,
-    height: 40,
+    borderColor: '#d1d1d1',
+    padding: 2,
+    borderRadius: 9,
+    height: 50,
     marginBottom: 10,
     backgroundColor: '#f5f5f5',
     alignItems: 'center',
@@ -240,18 +253,58 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     flex: 1,
-    borderRadius: 15,
+    borderRadius: 9,
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
   },
   toggleActive: {
-    backgroundColor: '#d3d3d3',
+    backgroundColor: '#fff',
   },
   toggleText: {
     fontSize: 15,
     fontFamily: 'SpaceGrotesk_400Regular',
+    fontWeight:'bold'
   },
-  // New styles for supplier cards
- 
+  toggleTextActive: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
+   toggleContainers: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    borderRadius: 10,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    marginLeft:20,
+    marginRight:20,
+    width:'95%',
+    alignSelf:'center',
+    height:56,
+  },
+  toggleButtons: {
+    flex: 1,
+    padding: 12,
+    alignItems: "center",
+    backgroundColor: "#f9fafb",
+    flexDirection:'row',
+    justifyContent:'space-between',
+    paddingRight:20,
+  },
+  toggleButtonsa: {
+    flex: 1,
+    padding: 12,
+    alignItems: "center",
+    backgroundColor: "#f9fafb",
+    justifyContent:'center',
+     paddingRight:20,
+  },
+  toggleActives: {
+    backgroundColor: "#3B82F6",
+  },
+  toggleTexts: { fontSize: 16, color: "#6B7280", fontWeight: "500" },
+  toggleTextActives: { color: "#fff", fontWeight: "700" },
+
 });

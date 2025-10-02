@@ -35,7 +35,7 @@ export default function SupplierScreen() {
         </TouchableOpacity>
       )}
     >
-      <TouchableOpacity onPress={() => navigation.navigate('QR', { supplierId: item.id })}>
+      <TouchableOpacity onPress={() => navigation.navigate('QR', { supplierId: item.id,suppliersName:item.Supplier_name })}>
         <View style={styles.card}>
           <View style={{ justifyContent: 'center' }}>
             <Text style={styles.name}>{item.Supplier_name}</Text>
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   callButton: {
-    backgroundColor: '#22C55E',
+    backgroundColor: '#3B82F6',
     padding: 10,
     borderRadius: 50,
     alignItems: 'center',
@@ -141,10 +141,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     bottom: 30,
     right: 20,
-    backgroundColor: '#22C55E',
+    backgroundColor: '#3B82F6',
+     shadowColor:'#3B82F6',
+    shadowOpacity: 1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 3,
     padding: 15,
     borderRadius: 50,
-    elevation: 5,
     height: 60,
     width: 60,
   },
